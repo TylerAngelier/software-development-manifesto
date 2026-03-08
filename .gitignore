@@ -1,0 +1,13 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Specs directory (created when using the workflow)
+.ai/specs/*.md
+!.ai/specs/README.md

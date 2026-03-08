@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spec to Beads"
+  short_description: "Draft reviewed specs and seed Beads tasks"
+  default_prompt: "Use $spec-to-beads to draft a durable feature spec and translate the approved work into Beads tasks."

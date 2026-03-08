@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement Bead Task"
+  short_description: "Implement one Beads task with review"
+  default_prompt: "Use $implement-bead-task to claim one Beads task, implement it, review it, and close it."
