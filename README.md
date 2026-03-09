@@ -76,6 +76,33 @@ Workflow note: [skills/implement-bead-task/references/ai/commands/conventional-c
 - Fresh context per task is mandatory. Long agent sessions degrade quality.
 - No worktrees. Single-checkout discipline reduces local state complexity for solo task execution.
 
+## Rigor Scale
+
+Workflow depth should match task complexity. See `DECISION-FRAMEWORK.md` for detailed guidance.
+
+| Task Type | Workflow |
+|-----------|----------|
+| Bug fix | No spec needed. Clear prompt → Implement → Review → Done |
+| Small feature | Lightweight spec (What/Why) → Implement → Review |
+| Complex feature | Full spec with constraints, design notes, thorough review |
+| New product | Full PRD, design doc, stakeholder approval before implementation |
+
+**One rule always applies:** Clearer instructions produce better output, regardless of task size.
+
+## AI Throughout the Lifecycle
+
+```mermaid
+flowchart LR
+    R[Requirements] --> D[Design]
+    D --> P[Plan]
+    P --> B[Build]
+    B --> Rv[Review]
+    Rv --> Dp[Deploy]
+    Dp --> M[Monitor]
+```
+
+The best engineers use AI at every stage, not just for code generation. This repo focuses on the spec-driven workflow for features, but the same AI-assisted approach applies to requirements gathering, design, review, deployment, and monitoring.
+
 ## Sources That Informed This Repo
 
 - Owain Lewis, "Stop Vibe Coding — How to Build Software With AI Like a Senior Engineer"

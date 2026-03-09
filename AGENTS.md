@@ -22,6 +22,29 @@ The `/spec`, `/implement-task`, and `/conventional-commit` labels below describe
 - Keep context fresh. Start each task from the Beads issue and linked spec instead of relying on a long prior chat.
 - Do not commit code that has not passed the task verification steps.
 
+## Task Classification
+
+Not all tasks require the full workflow. Use `DECISION-FRAMEWORK.md` to determine the appropriate level of rigor.
+
+Quick guidance:
+- **Trivial fixes** (typos, comments): Fix directly, then commit
+- **Bug fixes**: Clear prompt, implement, review, commit
+- **Features**: Use `/spec` workflow with depth proportional to complexity
+
+When in doubt, start with more rigor. It is easier to reduce ceremony than to add missing controls retroactively.
+
+## AI at Every Stage
+
+AI accelerates the entire software development lifecycle, not just coding:
+
+1. **Requirements** — Draft PRDs, challenge assumptions, prototype to test ideas
+2. **Technical Design** — Think through tradeoffs, document decisions
+3. **Task Breakdown** — Break specs into bounded tasks with context
+4. **Build** — Write code with proper briefing
+5. **Review** — Self-review catches issues missed during generation
+6. **Deploy** — Set up CI/CD and infrastructure
+7. **Monitor** — Configure alerts, error tracking, logging
+
 ## Beads Rules
 
 - Use `bd ready` to find unblocked work.
