@@ -7,16 +7,30 @@ description: Implement one approved Beads task with a controller-led review loop
 
 Claim one Beads task, implement it against the linked spec, run review and verification, then close the task. Keep scope tight and do not mix unrelated work into the same execution.
 
+## Use This Skill When
+
+- the user asks for `/implement-task`
+- a Beads task is already approved and linked to a spec
+- one bounded task should be implemented, reviewed, verified, and closed
+
+## Do Not Use This Skill When
+
+- the work still needs a spec or approval first
+- the request is a small bug fix better handled by `bugfix-fast-path`
+- the user wants a standalone review without implementation; use `review-task`
+
+If the correct workflow is unclear, use `workflow-triage` first.
+
 ## Read These Files
 
 Read only the files needed for the current request:
 
-- `references/ai/commands/implement-task.md`
-- `references/ai/reference/codex-multi-agent.md`
-- `references/ai/commands/conventional-commit.md`
-- `references/ai/commands/spec.md`
-- `references/ai/templates/spec.md`
-- `references/ai/specs/README.md`
+- `../shared-ai/commands/implement-task.md`
+- `../shared-ai/reference/codex-multi-agent.md`
+- `../shared-ai/commands/conventional-commit.md`
+- `../shared-ai/commands/spec.md`
+- `../shared-ai/templates/spec.md`
+- `../shared-ai/specs/README.md`
 - `../../AGENTS.md`
 - the Beads issue resolved from an explicit ID or `bd ready`
 - the linked spec in `.ai/specs/` (repo-level specs directory)
@@ -30,14 +44,27 @@ Read only the files needed for the current request:
 4. Decide delegation:
    - implement locally for a very small change
    - or use one `worker` implementer for the bounded patch
-5. Run the task verification as soon as the patch exists.
+5. Run the first round of task verification as soon as the patch exists.
 6. Run a fresh review phase:
    - use a `default` reviewer when subagent support exists
    - otherwise run a separate controller-led review pass
 7. Fix accepted findings.
 8. Rerun verification.
-9. Update Beads notes if needed and close the task.
-10. Hand off to the existing conventional commit workflow.
+9. Update Beads notes with verification evidence, manual checks, and any consciously accepted residual risk.
+10. Close the task.
+11. Hand off to the `conventional-commit` skill.
+
+## Verification Expectations
+
+Use the strongest available verification that fits the task:
+
+1. targeted automated checks
+2. new or updated tests when behavior changes and the repo supports them
+3. broader safety checks for risky changes
+4. focused manual validation for behavior not covered by automation
+5. Beads notes that record what actually ran
+
+If no automated tests exist, do not treat that as invisible. Either add the missing coverage or explicitly document why manual verification is the best available evidence.
 
 ## Multi-Agent Use
 
@@ -46,6 +73,28 @@ Read only the files needed for the current request:
 - Keep one write owner at a time for the active patch.
 - Treat the reviewer as read-only.
 - If subagent support is unavailable, keep the phases separate anyway: implement, review, fix, verify, close.
+
+## Worked Examples
+
+### Good Fit
+
+> "Use `/implement-task` for BD-142. The spec is approved. Claim it, implement it, review it, and close it."
+
+Expected outcome:
+
+- one task claimed
+- bounded patch
+- verification and review recorded
+- task closed only after checks pass
+
+### Poor Fit
+
+> "Please look over this diff and tell me if it is safe."
+
+Better path:
+
+- use `review-task`
+- do not claim or close a Beads task unless implementation is also requested
 
 ## Output
 

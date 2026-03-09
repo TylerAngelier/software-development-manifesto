@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workflow Triage"
+  short_description: "Choose the minimum safe workflow for a request"
+  default_prompt: "Use $workflow-triage to classify the request and choose the right workflow: direct fix, bugfix-fast-path, spec-to-beads, or implement-bead-task."

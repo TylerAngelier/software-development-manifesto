@@ -11,6 +11,7 @@ Produce a durable, reviewable spec and then translate the approved work into Bea
 - user request
 - relevant code and docs
 - existing architectural constraints
+- decision-framework classification when available
 
 ## Output
 
@@ -33,6 +34,7 @@ Use the definitions in `../reference/codex-multi-agent.md`.
    - what will be built
    - what will not be built
    - what patterns and files must be followed
+   - security, data, rollback, and cross-system impact when relevant
    - how success will be verified
 4. Save the spec under `.ai/specs/`.
 5. Ask for human review before creating tasks or code.
@@ -73,5 +75,6 @@ Stop and ask for review when:
 - the spec introduces a new architectural decision
 - the scope is ambiguous
 - the validation strategy is unclear
+- rollback, data, or security implications are not understood
 
 Do not start implementation during `/spec` unless the user explicitly changes direction.

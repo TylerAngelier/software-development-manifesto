@@ -1,17 +1,30 @@
 ---
-name: conventional-commits
-description: "Create git commits using the Conventional Commits specification, with a required body that starts with `Why: ...`. Use whenever Codex is about to run `git commit`, create a commit, split work into commits, or write/rewrite a commit message, including autonomous workflows where the user did not explicitly mention this skill. Prefer small, coherent, working commits and avoid bundling unrelated changes together."
+name: conventional-commit
+description: "Create git commits using the Conventional Commits specification, with a required body that starts with `Why: ...`. Use whenever the agent is about to run `git commit`, create a commit, split work into commits, or write or rewrite a commit message. Prefer small, coherent, working commits and avoid bundling unrelated changes together."
 ---
 
-# Conventional Commits Skill
+# Conventional Commit Skill
 
 ## Announce at start
 
 When you activate this skill, **say exactly**:
 
-> "I'm using the conventional-commits skill to create properly formatted commit messages."
+> "I'm using the conventional-commit skill to create properly formatted commit messages."
 
----
+## Use This Skill When
+
+- a task or bugfix is finished and ready to commit
+- the user asks for `/conventional-commit`
+- the agent is about to run `git commit`
+- the current diff may need to be split into smaller coherent commits
+
+## Do Not Use This Skill When
+
+- the work has not been verified yet
+- review findings are still unresolved
+- the diff mixes unrelated changes that should be separated first
+
+If the workflow itself is unclear, use `workflow-triage` or finish `/implement-task` or `bugfix-fast-path` first.
 
 ## Commit Size Policy
 
@@ -26,8 +39,6 @@ When preparing commits:
 
 Treat "small working commits" as part of using this skill, not as an optional preference.
 
----
-
 ## Commit Message Format
 
 All commit messages MUST follow this structure:
@@ -41,8 +52,6 @@ Why: <reason>
 
 [optional footer(s)]
 ```
-
----
 
 ## Required Types
 
@@ -60,8 +69,6 @@ Why: <reason>
 | `style` | Changes that do not affect the meaning of the code (white-space, formatting, etc.) | - |
 | `test` | Adding missing tests or correcting existing tests | - |
 
----
-
 ## Scope (Optional)
 
 A scope provides additional context and MUST be a noun describing a section of the codebase:
@@ -71,8 +78,6 @@ feat(parser): add ability to parse arrays
 fix(api): handle timeout errors gracefully
 docs(readme): update installation instructions
 ```
-
----
 
 ## Breaking Changes
 
@@ -97,25 +102,12 @@ BREAKING CHANGE: The /v1/* endpoints have been removed. Migrate to /v2/* endpoin
 
 **Note:** `BREAKING CHANGE` MUST be uppercase. `BREAKING-CHANGE` is also acceptable.
 
----
-
 ## Description Rules
 
 1. MUST immediately follow the colon and space after type/scope
 2. MUST be a short summary of the code changes
 3. SHOULD be in imperative mood ("add feature" not "added feature")
 4. SHOULD NOT end with a period
-
-**Good examples:**
-- `fix: prevent racing of requests`
-- `feat(lang): add Polish language support`
-- `docs: correct spelling in CHANGELOG`
-
-**Bad examples:**
-- `fixed the bug` (missing type)
-- `feat: Added a new button.` (past tense, period at end)
-
----
 
 ## Body (Required)
 
@@ -139,19 +131,6 @@ Why: <reason for the change>
 [optional extra context paragraph]
 ```
 
-Example:
-
-```
-fix: prevent racing of requests
-
-Why: Avoid stale responses overwriting the latest UI state during slow or out-of-order network calls.
-
-Introduce a request id and a reference to latest request. Dismiss
-incoming responses other than from latest request.
-```
-
----
-
 ## Footers (Optional)
 
 Footers MAY be provided one blank line after the body:
@@ -160,19 +139,26 @@ Footers MAY be provided one blank line after the body:
 2. Token MUST use `-` instead of spaces (except `BREAKING CHANGE`)
 3. Common footers: `Reviewed-by`, `Refs`, `Closes`, `Co-authored-by`
 
-```
-fix: prevent racing of requests
+## Worked Examples
 
-Why: Avoid stale responses overwriting the latest UI state during slow or out-of-order network calls.
+### Good Fit
 
-Introduce a request id and a reference to latest request.
+> "Use `/conventional-commit` for the finished BD-142 work."
 
-Reviewed-by: Jane Doe
-Refs: #123
-Closes: #456
-```
+Expected outcome:
 
----
+- diff checked for logical scope
+- one small working commit
+- body starts with `Why:`
+
+### Poor Fit
+
+> "Commit whatever is currently in the tree even though tests are failing."
+
+Better path:
+
+- finish verification first
+- or split and stabilize a smaller working slice before committing
 
 ## Examples by Scenario
 
@@ -197,39 +183,15 @@ refactor!: rename all public API methods
 Why: Align the public API with the new SDK naming scheme before the next release.
 ```
 
-### Breaking change with footer
-```
-feat(api): migrate to OAuth 2.0
-
-Why: Replace long-lived API keys with a more secure authentication model required by new integrations.
-
-BREAKING CHANGE: API key authentication has been removed. All clients must now use OAuth 2.0 bearer tokens.
-```
-
 ### Multiple footers
 ```
 feat: add user preferences sync
 
 Why: Preserve a consistent experience for users switching between devices.
 
-Implement cross-device preference synchronization using WebSocket
-connections with conflict resolution.
-
 Reviewed-by: Alice Smith
-Co-authored-by: Bob Jones <bob@example.com>
 Closes: #789
 ```
-
-### Revert commit
-```
-revert: let us never again speak of the noodle incident
-
-Why: Restore the previous behavior because the reverted change broke production imports.
-
-Refs: 676104e, a215868
-```
-
----
 
 ## Workflow
 
@@ -246,8 +208,6 @@ When creating a commit:
 
 If a task reasonably produces multiple independent working checkpoints, repeat this workflow for each checkpoint rather than waiting to create one final aggregate commit.
 
----
-
 ## Commit Command
 
 After constructing the message, use:
@@ -260,7 +220,7 @@ Or for multi-line messages:
 
 ```bash
 git commit -F - <<EOF
-<type>[scope]: <description>
+<type>[optional scope]: <description>
 
 Why: <reason>
 
@@ -269,16 +229,3 @@ Why: <reason>
 [optional footer(s)]
 EOF
 ```
-
----
-
-## Common Mistakes to Avoid
-
-| Mistake | Wrong | Right |
-|---------|-------|-------|
-| Missing type | `fixed bug` | `fix: handle null pointer` |
-| Missing colon | `feat add button` | `feat: add button` |
-| Period at end | `fix: resolve issue.` | `fix: resolve issue` |
-| Past tense | `feat: added feature` | `feat: add feature` |
-| Lowercase BREAKING CHANGE | `breaking change: ...` | `BREAKING CHANGE: ...` |
-| Scope without parens | `feat-api: ...` | `feat(api): ...` |

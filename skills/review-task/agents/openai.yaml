@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Task"
+  short_description: "Review one task or diff in fresh context"
+  default_prompt: "Use $review-task to review one task or diff against the spec, acceptance criteria, changed files, and verification output."

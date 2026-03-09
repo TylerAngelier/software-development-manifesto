@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bugfix Fast Path"
+  short_description: "Handle a bounded bug fix with review and verification"
+  default_prompt: "Use $bugfix-fast-path to clarify a bounded bug, implement the smallest effective fix, review it, verify it, and prepare it for commit."
