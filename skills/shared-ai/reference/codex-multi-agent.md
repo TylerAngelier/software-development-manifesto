@@ -82,8 +82,6 @@ Good fits:
 
 ## Repo-Defined Subagent Roles
 
-These are the named roles used by this repo today and intended to map cleanly into future skills.
-
 ### Spec Analyst
 
 - Codex type: `explorer`
@@ -103,15 +101,15 @@ These are the named roles used by this repo today and intended to map cleanly in
 ### Implementer
 
 - Codex type: `worker`
-- Used by: `/implement-task`
-- Purpose: make the bounded patch for the current Beads task
-- Input: task ID, linked spec, acceptance criteria, file ownership, verification command
+- Used by: `/implement-task` and `/bugfix-fast-path`
+- Purpose: make the bounded patch for the current Beads task or bugfix scope
+- Input: task ID or bug summary, linked spec when present, acceptance criteria or exit criteria, file ownership, verification command
 - Output: changed files, verification attempted, unresolved risks
 
 ### Reviewer
 
 - Codex type: `default`
-- Used by: `/implement-task`
+- Used by: `/implement-task`, `/review-task`, `/bugfix-fast-path`
 - Purpose: perform fresh-context review of the implemented change
 - Input: task summary, spec summary, diff summary, test or verification results
 - Output: prioritized findings only, not a rewrite
@@ -119,7 +117,7 @@ These are the named roles used by this repo today and intended to map cleanly in
 ### Verification Helper
 
 - Codex type: `explorer` or `default`
-- Used by: `/implement-task` only when needed
+- Used by: `/implement-task` or `/bugfix-fast-path` only when needed
 - Purpose: diagnose a failing verification step or unclear test result
 - Input: failing command output, relevant files
 - Output: likely cause and targeted next action
@@ -148,9 +146,7 @@ The workflow remains:
 2. review
 3. fix
 4. verify
-5. close
-
-The difference is that the role separation is procedural rather than delegated.
+5. close or hand off
 
 ## Command Mapping
 
@@ -164,12 +160,6 @@ Recommended sequence:
 4. Optional `Spec Critic` reviews the draft for missing constraints or weak validation.
 5. Human reviews and approves the spec.
 6. Controller creates the Beads epic and child tasks.
-
-Subagent count:
-
-- minimum: 0
-- typical: 1
-- maximum: 2
 
 ### `/implement-task`
 
@@ -185,25 +175,33 @@ Recommended sequence:
 8. `Implementer` or controller fixes accepted findings.
 9. Controller reruns verification and closes the task.
 
-Subagent count:
+### `/review-task`
 
-- minimum: 1
-- typical: 2
-- maximum: 3
+Recommended sequence:
+
+1. Controller gathers the Beads issue, linked spec, diff summary, and verification output.
+2. `Reviewer` performs a read-only review.
+3. Controller triages findings and decides next actions.
+
+### `/bugfix-fast-path`
+
+Recommended sequence:
+
+1. Controller confirms the issue is a bounded bug fix.
+2. Controller gathers reproduction and affected code.
+3. Optional `Implementer` makes the patch.
+4. Controller runs verification.
+5. `Reviewer` reviews the fix in fresh context.
+6. Controller fixes accepted findings and reruns verification.
+7. Controller hands off to `/conventional-commit`.
 
 ### `/conventional-commit`
 
 Recommended sequence:
 
-1. Controller confirms the task is closed and verification is green.
-2. Implementer or controller reuses the finalized task summary from the review-complete state.
-3. Controller uses the existing `conventional-commits` skill to create the commit.
-
-Subagent count:
-
-- minimum: 0
-- typical: 0
-- maximum: 0
+1. Controller confirms the task is closed or the bugfix is otherwise complete and verification is green.
+2. Implementer or controller reuses the finalized summary from the review-complete state.
+3. Controller uses the `conventional-commit` skill to create the commit.
 
 ## Output Contracts
 

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Conventional Commits"
-  short_description: "Use for every git commit and keep commits small"
-  default_prompt: "Use $conventional-commits whenever you are about to run git commit. Create a small coherent working commit and write a Conventional Commit message with a required Why: body from the staged diff."

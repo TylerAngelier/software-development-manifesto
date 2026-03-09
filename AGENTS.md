@@ -4,14 +4,15 @@
 
 This repo defines a single-checkout workflow for building software with AI like a disciplined engineer:
 
-- draft a spec
+- classify the request to the right rigor level
+- draft a spec when needed
 - get human approval
 - translate approved work into `bd` tasks
 - implement one task at a time
 - run an independent review loop
 - commit with conventional commits
 
-The `/spec`, `/implement-task`, and `/conventional-commit` labels below describe workflow entrypoints. Treat them as prompt/runbook names unless the surrounding toolchain explicitly wires them up as native commands.
+The `/workflow-triage`, `/spec`, `/implement-task`, `/review-task`, `/bugfix-fast-path`, and `/conventional-commit` labels below describe workflow entrypoints. Treat them as prompt/runbook names unless the surrounding toolchain explicitly wires them up as native commands.
 
 ## Non-Negotiables
 
@@ -24,12 +25,13 @@ The `/spec`, `/implement-task`, and `/conventional-commit` labels below describe
 
 ## Task Classification
 
-Not all tasks require the full workflow. Use `DECISION-FRAMEWORK.md` to determine the appropriate level of rigor.
+Not all tasks require the full workflow. Use `DECISION-FRAMEWORK.md` or `/workflow-triage` to determine the appropriate level of rigor.
 
 Quick guidance:
 - **Trivial fixes** (typos, comments): Fix directly, then commit
-- **Bug fixes**: Clear prompt, implement, review, commit
-- **Features**: Use `/spec` workflow with depth proportional to complexity
+- **Bug fixes**: Use `/bugfix-fast-path`
+- **Features**: Use `/spec` with depth proportional to complexity, then `/implement-task`
+- **Standalone review**: Use `/review-task`
 
 When in doubt, start with more rigor. It is easier to reduce ceremony than to add missing controls retroactively.
 
@@ -52,12 +54,13 @@ AI accelerates the entire software development lifecycle, not just coding:
 - Every implementation task should link back to a spec with `--spec-id`.
 - Put acceptance criteria in the issue with `--acceptance`.
 - Put execution notes or technical caveats in `--design` or `--notes`.
+- Record meaningful verification evidence in `--notes` before closing the task.
 - Use dependencies instead of prose to represent ordering.
 - Close the task only after verification and review are complete.
 
 ## Roles
 
-Detailed role definitions and command mappings live in `skills/spec-to-beads/references/ai/reference/codex-multi-agent.md`.
+Detailed role definitions and command mappings live in `skills/shared-ai/reference/codex-multi-agent.md`.
 
 ### Controller
 
@@ -74,7 +77,7 @@ The main Codex thread is the controller. It owns:
 
 The implementer agent writes or changes code for the claimed task only.
 
-- Keep scope limited to the current Beads issue.
+- Keep scope limited to the current Beads issue or bounded bugfix.
 - Follow the linked spec, existing patterns, and acceptance criteria.
 - Report what changed, what was verified, and any remaining risk.
 
@@ -83,7 +86,7 @@ The implementer agent writes or changes code for the claimed task only.
 The reviewer agent is a fresh-context reviewer.
 
 - Review against the spec, acceptance criteria, diff, and test results.
-- Prioritize bugs, regressions, edge cases, missing tests, and scope drift.
+- Prioritize bugs, regressions, edge cases, missing tests, weak verification, and scope drift.
 - Do not become a second implementer unless the controller explicitly requests it.
 
 ## Codex Agent Types
@@ -106,12 +109,21 @@ Do not use a spawned subagent when the controller can complete the work more dir
 - Prefer a controller-led sequence: implement -> review -> fix -> verify.
 - If subagent support is unavailable, preserve the same phases sequentially in the controller thread.
 
+## `/workflow-triage`
+
+When the user asks for `/workflow-triage`:
+
+1. Read the request and enough repo context to classify it.
+2. Apply the questions in `DECISION-FRAMEWORK.md`.
+3. Route to the lightest safe workflow.
+4. Ask clarifying questions if classification is blocked.
+
 ## `/spec`
 
 When the user asks for `/spec`:
 
 1. Read the relevant code and constraints.
-2. Draft a spec from `skills/spec-to-beads/references/ai/templates/spec.md`.
+2. Draft a spec from `skills/shared-ai/templates/spec.md`.
 3. Save it under `.ai/specs/<slug>.md`.
 4. Stop for human review before creating tasks or code.
 5. After approval, create one epic and the child tasks in `bd`.
@@ -136,7 +148,7 @@ When the user asks for `/implement-task`:
 6. Ask a fresh reviewer subagent to review the result when available. Otherwise run a separate controller-led review pass before fixing.
 7. Fix accepted findings.
 8. Rerun verification.
-9. Update Beads notes if needed and close the issue.
+9. Update Beads notes with verification evidence if needed and close the issue.
 
 The controller owns final judgment on reviewer findings.
 
@@ -146,22 +158,50 @@ Typical subagents:
 - optional `worker` as implementer
 - `default` reviewer for fresh-context review
 
+## `/review-task`
+
+When the user asks for `/review-task`:
+
+1. Gather the task, spec, changed files, and verification evidence.
+2. Run a fresh-context review.
+3. Return prioritized findings or explicit approval.
+4. Keep the reviewer read-only unless the user changes scope.
+
+## `/bugfix-fast-path`
+
+When the user asks for `/bugfix-fast-path`:
+
+1. Confirm the request is a bounded bug fix.
+2. Clarify expected and broken behavior.
+3. Implement the smallest effective fix.
+4. Verify, review, fix, and verify again.
+5. Hand off to `/conventional-commit`.
+
+Escalate to `/spec` if the work turns into a feature, migration, or architecture decision.
+
 ## `/conventional-commit`
 
 When the user asks for `/conventional-commit`:
 
-- Use the existing `conventional-commits` skill.
-- Keep the commit scoped to the current task.
+- Use the `conventional-commit` skill.
+- Keep the commit scoped to the current task or bugfix.
 - Include Beads traceability in the message where practical.
 - The commit body must start with `Why:`.
 
 ## Files To Know
 
-- `skills/spec-to-beads/references/ai/templates/spec.md`
+- `skills/shared-ai/templates/spec.md`
 - `.ai/specs/`
-- `skills/spec-to-beads/references/ai/reference/codex-multi-agent.md`
-- `skills/spec-to-beads/references/ai/commands/spec.md`
-- `skills/implement-bead-task/references/ai/commands/implement-task.md`
-- `skills/implement-bead-task/references/ai/commands/conventional-commit.md`
+- `skills/shared-ai/reference/codex-multi-agent.md`
+- `skills/shared-ai/commands/workflow-triage.md`
+- `skills/shared-ai/commands/spec.md`
+- `skills/shared-ai/commands/implement-task.md`
+- `skills/shared-ai/commands/review-task.md`
+- `skills/shared-ai/commands/bugfix-fast-path.md`
+- `skills/shared-ai/commands/conventional-commit.md`
+- `skills/workflow-triage/SKILL.md`
 - `skills/spec-to-beads/SKILL.md`
 - `skills/implement-bead-task/SKILL.md`
+- `skills/review-task/SKILL.md`
+- `skills/bugfix-fast-path/SKILL.md`
+- `skills/conventional-commit/SKILL.md`

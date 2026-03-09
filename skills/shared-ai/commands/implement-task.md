@@ -7,10 +7,11 @@ Use this runbook when the user wants one approved Beads task implemented.
 Implement a single task with a controller-led Codex multi-agent loop:
 
 1. implement
-2. review
-3. fix
-4. verify
-5. close task
+2. verify early
+3. review
+4. fix
+5. verify again
+6. close task
 
 ## Inputs
 
@@ -82,11 +83,29 @@ bd update <task-id> --claim
 
 9. Rerun verification.
 
-10. Update Beads notes if needed and close the task.
+10. Update Beads notes with:
+    - commands run
+    - pass/fail status
+    - manual verification performed
+    - any consciously accepted residual risk
+
+11. Close the task.
 
 ```bash
 bd close <task-id> --reason "Completed"
 ```
+
+## Verification Ladder
+
+Use the strongest available verification that fits the task:
+
+1. Run existing automated checks for the touched area.
+2. Add or update targeted tests when behavior changes and the repo supports it.
+3. Run broader safety checks when risk justifies them: lint, typecheck, build, integration tests.
+4. Perform focused manual validation for user-visible behavior, migrations, or operational steps.
+5. Record the verification evidence in Beads notes before closing.
+
+If automated coverage is missing, do not silently downgrade quality. Either add the missing test coverage, or explicitly document why manual verification is the best available option.
 
 ## Implementer Prompt Shape
 
@@ -113,6 +132,7 @@ Ask for a code-review result, not a rewrite:
 - check behavior against the spec
 - find bugs, regressions, edge cases, security issues, and missing tests
 - call out scope drift
+- challenge weak verification, especially when tests are absent
 - prefer concrete findings over style comments
 
 Expected reviewer output:
@@ -129,6 +149,7 @@ Do not close the task until:
 - acceptance criteria are satisfied
 - verification passes or failures are explicitly accepted by the user
 - reviewer findings are addressed or consciously rejected
+- Beads notes capture enough verification detail for a later reader to trust the closure
 
 ## Follow-On
 

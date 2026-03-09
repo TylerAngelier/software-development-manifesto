@@ -40,11 +40,29 @@ Match your workflow depth to task complexity:
 
 | Level | Example | Workflow |
 |-------|---------|----------|
-| 1. Trivial fix | Typo, comment | Fix → Commit |
-| 2. Bug fix | Login error | Clear prompt → Implement → Review → Commit |
-| 3. Small feature | Add filter | Lightweight spec (What/Why) → Implement → Review |
-| 4. Complex feature | Auth system | Full spec + design notes → Implement → Thorough review |
-| 5. New product | Greenfield | Full PRD → Design doc → Stakeholder approval → Implement |
+| 1. Trivial fix | Typo, comment | Direct fix → `/conventional-commit` |
+| 2. Bug fix | Login error | `/bugfix-fast-path` |
+| 3. Small feature | Add filter | Lightweight `/spec` → `/implement-task` |
+| 4. Complex feature | Auth system | Full `/spec` + design notes → `/implement-task` |
+| 5. New product | Greenfield | Full PRD → Design doc → Stakeholder approval → implementation plan |
+
+---
+
+## Make It Executable
+
+Use `/workflow-triage` when the path is not obvious. It should answer:
+
+1. **What class of work is this?**
+2. **What is the minimum safe workflow?**
+3. **What additional questions must be answered before work starts?**
+
+Default routing:
+
+- **Trivial fix** → direct change, then `/conventional-commit`
+- **Bug fix** → `/bugfix-fast-path`
+- **Approved Beads task** → `/implement-task`
+- **Feature or ambiguous scoped change** → `/spec`
+- **Standalone review request** → `/review-task`
 
 ---
 
@@ -60,6 +78,48 @@ Before starting, ask yourself:
 6. **Could this introduce regressions?**
 
 If **yes** to any question: increase your rigor level.
+
+---
+
+## Fast Classification Heuristics
+
+### Trivial fix
+
+Use the direct path when the change is low-risk and non-behavioral.
+
+Examples:
+- typo fixes
+- comment cleanup
+- obvious docs corrections
+
+### Bug fix
+
+Use `/bugfix-fast-path` when the behavior is wrong and the expected behavior is already known.
+
+Examples:
+- null handling bug
+- regression in validation
+- broken edge case in an existing feature
+
+Escalate if the "bug fix" actually changes product behavior or architecture.
+
+### Small feature
+
+Use a lightweight `/spec` when the change is new behavior but still bounded.
+
+Examples:
+- add a filter
+- add an export button
+- add a small admin control
+
+### Complex feature
+
+Use a full `/spec` when the work involves architecture, migrations, rollout, or multiple systems.
+
+Examples:
+- auth redesign
+- billing workflow changes
+- background jobs with retries and operational impact
 
 ---
 
@@ -79,9 +139,7 @@ In scope: Email/password login, signup page
 Out of scope: OAuth, password reset (v1), admin roles
 ```
 
-AI can help you draft this, challenge your assumptions, and even prototype quickly to test ideas before committing.
-
-**Key insight:** Prototyping is now fast enough to be a planning tool. Build throwaway versions to learn, not to ship.
+AI can help you draft this, challenge assumptions, and even prototype quickly to test ideas before committing.
 
 ### 2. Technical Design
 
@@ -111,17 +169,13 @@ User model is already defined in app/models/user.py.
 Follow the existing pattern in app/routers/health.py.
 ```
 
-The difference in output quality is dramatic.
-
 ### 4. Build
 
 Brief the agent properly. Give it:
-- Background on what you're building
-- Your technical design decisions
-- The specific task
-- Constraints and preferences
-
-An LLM makes hundreds of small decisions as it writes code. Context makes those decisions well-informed. Without it, the agent guesses.
+- background on what you're building
+- your technical design decisions
+- the specific task
+- constraints and preferences
 
 ### 5. Review
 
@@ -129,31 +183,16 @@ This is the step most people skip. Don't.
 
 **Self-review:** Ask the agent to review its own code. Generation and review are different cognitive tasks. Almost every time, the agent finds issues it missed on the first pass.
 
-```
-Look at the code you just wrote. Find any bugs, edge cases,
-security issues, or potential problems.
-```
-
 Common things caught on review:
-- Edge cases and error handling
-- Security vulnerabilities
-- Missing input validation
-- Performance issues
-
-**Human review:** You don't need to read every line, but understand what was built. Does it match your design? Are there obvious issues?
-
-**Automated review:** Layer in CI/CD checks, static analysis, and AI-powered PR review tools.
+- edge cases and error handling
+- security vulnerabilities
+- missing input validation
+- performance issues
+- weak or missing verification
 
 ### 6. Deploy
 
 Get your code to production. AI can help you set up deployment pipelines, CI/CD, and infrastructure if you're not familiar with them.
-
-**Example prompt:**
-
-```
-Commit and save these changes with a clear commit message.
-Then push the latest version to GCP Cloud Run.
-```
 
 ### 7. Monitor
 
@@ -178,15 +217,18 @@ Avoid these common mistakes:
 | Skipping review | "It looks fine" | Always review, even for small changes |
 | Handing agents too much scope | "Build the whole app" | One bounded task at a time |
 | First output acceptance | Taking generated code as-is | Ask for self-review |
+| Invisible verification gaps | Closing work with no evidence | Record what was actually verified |
 
 ---
 
 ## Integration with Repo Workflow
 
-This framework complements the repo's `/spec` → `/implement-task` → `/conventional-commit` workflow:
+This framework complements the repo's `/workflow-triage` → `/spec` → `/implement-task` → `/conventional-commit` workflows:
 
-- **Trivial/Bug fixes:** Skip `/spec`, use direct prompts with review
-- **Features:** Use `/spec` with depth proportional to complexity
-- **Complex features:** Full spec with design notes, constraints, thorough review
+- **Trivial fixes:** Direct prompt, direct fix, then commit
+- **Bug fixes:** `/bugfix-fast-path`
+- **Features:** `/spec` with depth proportional to complexity
+- **Complex features:** Full spec with design notes, impact, constraints, and thorough review
+- **Standalone review:** `/review-task`
 
 When in doubt, start with more rigor. It is easier to reduce ceremony than to add missing controls retroactively.

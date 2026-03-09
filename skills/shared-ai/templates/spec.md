@@ -41,15 +41,45 @@ Draft | Approved | Superseded
 - Decision:
   Reason:
 
+## Impact Assessment
+
+### Security / Privacy
+
+- [Auth, secrets, permissions, data exposure, abuse cases, privacy concerns]
+
+### Data / Migration
+
+- [Schema changes, backfills, irreversible writes, data retention, compatibility]
+
+### Cross-System Dependencies
+
+- [External services, downstream consumers, deployment ordering, contracts]
+
+### Rollback / Reversibility
+
+- [How to undo safely, what makes rollback hard, fallback path]
+
 ## Risks
 
 - [Main delivery or regression risks]
 
 ## Validation
 
-- Task-level checks:
-- End-to-end checks:
-- Manual review points:
+### Automated Checks
+
+- [Unit, integration, lint, typecheck, build, migration validation]
+
+### Manual Checks
+
+- [Human validation steps, exploratory scenarios, approval gates]
+
+### Observability / Monitoring
+
+- [Logs, metrics, alerts, dashboards, Sentry checks, post-release validation]
+
+## Launch / Rollout Notes
+
+- [Feature flags, staged rollout, migration sequencing, communication]
 
 ## Beads Translation
 

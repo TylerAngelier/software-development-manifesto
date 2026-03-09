@@ -7,27 +7,42 @@ description: Draft durable implementation specs and translate approved work into
 
 Draft the spec as the durable contract, then translate the approved work into `bd` issues. Keep the task system in Beads, not in markdown.
 
+## Use This Skill When
+
+- the user explicitly asks for `/spec`
+- the request is a feature, migration, or other non-trivial change that benefits from an approved contract
+- architectural, security, rollout, or rollback decisions need to be made explicit before implementation
+
+## Do Not Use This Skill When
+
+- the request is a trivial fix or documentation cleanup
+- the request is a bounded bug fix better handled by `bugfix-fast-path`
+- the user only wants implementation of an already-approved Beads task
+
+If the right rigor level is unclear, use `workflow-triage` first.
+
 ## Read These Files
 
 Read only the files needed for the current request:
 
-- `references/ai/templates/spec.md`
-- `references/ai/commands/spec.md`
-- `references/ai/specs/README.md`
-- `references/ai/reference/codex-multi-agent.md`
-- `references/ai/commands/implement-task.md`
-- `references/ai/commands/conventional-commit.md`
+- `../shared-ai/templates/spec.md`
+- `../shared-ai/commands/spec.md`
+- `../shared-ai/specs/README.md`
+- `../shared-ai/reference/codex-multi-agent.md`
+- `../shared-ai/commands/implement-task.md`
+- `../shared-ai/commands/conventional-commit.md`
 - `../../AGENTS.md`
 
 ## Workflow
 
 1. Read the user request and the minimum relevant repo context.
-2. Draft the spec at `.ai/specs/<slug>.md` using the template at `references/ai/templates/spec.md`.
+2. Draft the spec at `.ai/specs/<slug>.md` using the template at `../shared-ai/templates/spec.md`.
 3. Make the contract explicit:
    - why the work exists
    - concrete deliverable
    - must / must not / out of scope
    - technical decisions and constraints
+   - security, data, rollback, and cross-system impact where relevant
    - validation strategy
 4. Stop for human review before creating Beads tasks or code.
 5. After approval, create one Beads epic and the child tasks.
@@ -43,6 +58,27 @@ Read only the files needed for the current request:
 - Use an optional `explorer` as `Spec Analyst` for focused codebase discovery.
 - Use an optional `default` reviewer as `Spec Critic` to find ambiguity, weak validation, or missing constraints.
 - If subagent support is unavailable, keep the same phases sequentially in the controller thread.
+
+## Worked Examples
+
+### Good Fit
+
+> "Use `/spec` to plan a billing webhook retry system. We need retries, dead-letter handling, and rollout notes before building it."
+
+Expected outcome:
+
+- draft `.ai/specs/billing-webhook-retries.md`
+- explicit constraints and rollout notes
+- stop for human approval before task creation
+
+### Poor Fit
+
+> "Fix the typo in the README heading."
+
+Better path:
+
+- fix directly or use `workflow-triage`
+- do not create a full spec
 
 ## Output
 
